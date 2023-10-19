@@ -1,0 +1,160 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Campo Minado - Estilo Windows</title>
+    <link href="https://maxcdn.bootstrapcdn.com/bootstrap/5.0.0/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.7.2/font/bootstrap-icons.css" rel="stylesheet">
+    <style>
+        .board {
+            display: grid;
+            gap: 1px;
+        }
+        
+        .board button {
+            width: 37.8px; /* 10mm */
+            height: 37.8px; /* 10mm */
+            font-weight: bold;
+        }
+
+        .mine {
+            color: black;
+            font-size: 20px;
+        }
+
+        .number-1 {
+            color: blue;
+        }
+
+        .number-2 {
+            color: green;
+        }
+
+        .number-3 {
+            color: red;
+        }
+
+    </style>
+</head>
+
+<body style="background-color: white;">
+
+<div class="container mt-5">
+    <div class="row justify-content-center">
+        <div class="col-md-8 col-lg-6">
+            <div class="bg-white p-4 rounded text-dark">
+                <!-- Topo -->
+                <h2 class="text-center mb-4">Campo Minado - Estilo Windows</h2>
+                <div class="mb-3 d-flex justify-content-between">
+                    <div>
+                        <label for="boardSize">Tamanho do Quadrante:</label>
+                        <input type="number" id="boardSize" class="form-control" value="8" min="3" max="20">
+                    </div>
+                    <div>
+                        <label for="bombs">Bombas:</label>
+                        <input type="number" id="bombs" class="form-control" value="10" min="1">
+                    </div>
+                </div>
+                <button onclick="initializeGame()" class="btn btn-primary w-100">Começar Jogo</button>
+                
+                <!-- Corpo: Tabuleiro -->
+                <div class="board mt-4"></div>
+                
+                <!-- Rodapé -->
+                <div class="mt-4">
+                    <p class="text-center">Clique nas células para jogar!</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    let boardSize;
+    let bombs = [];
+    let buttons = [];
+    
+    function initializeGame() {
+        $('.board').empty();
+        buttons = [];
+        bombs = [];
+        boardSize = parseInt($('#boardSize').val());
+        let bombCount = parseInt($('#bombs').val());
+        while (bombs.length < bombCount) {
+            let randomCell = Math.floor(Math.random() * boardSize * boardSize);
+            if (!bombs.includes(randomCell)) {
+                bombs.push(randomCell);
+            }
+        }
+        drawBoard();
+    }
+
+    function adjacentBombs(x, y) {
+        let count = 0;
+        for (let i = -1; i <= 1; i++) {
+            for (let j = -1; j <= 1; j++) {
+                if (i === 0 && j === 0) continue;
+                let ni = x + i;
+                let nj = y + j;
+                if (ni >= 0 && nj >= 0 && ni < boardSize && nj < boardSize) {
+                    if (bombs.includes(ni * boardSize + nj)) {
+                        count++;
+                    }
+                }
+            }
+        }
+        return count;
+    }
+
+    function cellClicked(x, y) {
+        let index = x * boardSize + y;
+        let btn = buttons[x][y];
+        if (bombs.includes(index)) {
+            btn.html('<i class="bi bi-exclamation-triangle-fill mine"></i>');
+            gameOver();
+            return;
+        }
+        let count = adjacentBombs(x, y);
+        if (count !== 0) {
+            btn.text(count).addClass(`number-${count}`);
+        }
+        btn.prop('disabled', true);
+    }
+
+    function drawBoard() {
+        for (let i = 0; i < boardSize; i++) {
+            let row = $('<div class="d-flex"></div>');
+            buttons[i] = [];
+            for (let j = 0; j < boardSize; j++) {
+                let btn = $('<button class="btn btn-secondary"></button>').click(() => cellClicked(i, j));
+                buttons[i][j] = btn;
+                row.append(btn);
+            }
+            $('.board').append(row);
+        }
+    }
+
+    function gameOver() {
+        for (let x = 0; x < boardSize; x++) {
+            for (let y = 0; y < boardSize; y++) {
+                let btn = buttons[x][y];
+                if (bombs.includes(x * boardSize + y)) {
+                    btn.html('<i class="bi bi-exclamation-triangle-fill mine"></i>');
+                }
+                btn.prop('disabled', true);
+            }
+        }
+        alert('Você clicou em uma bomba! Jogo terminado.');
+    }
+
+    $(document).ready(function() {
+        initializeGame();
+    });
+</script>
+
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script src="https://maxcdn.bootstrapcdn.com/bootstrap/5.0.0/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

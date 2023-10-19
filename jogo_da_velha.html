@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Jogo da Velha</title>
+  <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" rel="stylesheet" />
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css" rel="stylesheet" />
+  <style>
+    .celula {
+      height: 60px;
+      width: 60px;
+      text-align: center;
+      vertical-align: middle;
+      line-height: 60px;
+      cursor: pointer;
+    }
+    .header, .footer {
+      color: white;
+      text-align: center;
+      padding: 20px 0;
+    }
+    .header {
+      background: blue;
+    }
+    .footer {
+      background: red;
+    }
+    .body-content {
+      background: white;
+      min-height: calc(100vh - 120px);
+      padding: 50px 0;
+    }
+    .tabuleiro-container {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: calc(100vh - 180px);
+    }
+    #tabuleiro {
+      box-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
+    }
+  </style>
+</head>
+<body>
+  <div class="header">Jogo da Velha</div>
+  <div class="body-content">
+    <div class="container">
+      <div class="row">
+        <div class="col-lg-6 offset-lg-3 tabuleiro-container">
+          <table id="tabuleiro" class="mb-5">
+          </table>
+        </div>
+      </div>
+      <button onclick="resetar()" class="btn btn-primary">Resetar Jogo</button>
+    </div>
+  </div>
+  <div class="footer">2023 Cesar Reis Lima. Todos os direitos reservados</div>
+
+  <script>
+    var jogadorAtual = 'X';
+    var tabuleiro = [
+      [null, null, null],
+      [null, null, null],
+      [null, null, null]
+    ];
+
+    function desenharTabuleiro() {
+      var tabuleiroHTML = document.getElementById('tabuleiro');
+      tabuleiroHTML.innerHTML = '';
+
+      for (var i = 0; i < 3; i++) {
+        var linha = document.createElement('tr');
+        for (var j = 0; j < 3; j++) {
+          var celula = document.createElement('td');
+          celula.innerHTML = tabuleiro[i][j] ? (tabuleiro[i][j] == 'X' ? '<i class="fas fa-times"></i>' : '<i class="far fa-circle"></i>') : '';
+          celula.classList.add('celula', 'border', 'border-dark');
+          celula.addEventListener('click', (function(i, j) {
+            return function() {
+              if (tabuleiro[i][j] === null) {
+                tabuleiro[i][j] = jogadorAtual;
+                jogadorAtual = jogadorAtual === 'X' ? 'O' : 'X';
+                desenharTabuleiro();
+                verificarVencedor();
+              }
+            };
+          })(i, j));
+          linha.appendChild(celula);
+        }
+        tabuleiroHTML.appendChild(linha);
+      }
+    }
+
+    function verificarVencedor() {
+      var linhas = [
+        [tabuleiro[0][0], tabuleiro[0][1], tabuleiro[0][2]],
+        [tabuleiro[1][0], tabuleiro[1][1], tabuleiro[1][2]],
+        [tabuleiro[2][0], tabuleiro[2][1], tabuleiro[2][2]],
+        [tabuleiro[0][0], tabuleiro[1][0], tabuleiro[2][0]],
+        [tabuleiro[0][1], tabuleiro[1][1], tabuleiro[2][1]],
+        [tabuleiro[0][2], tabuleiro[1][2], tabuleiro[2][2]],
+        [tabuleiro[0][0], tabuleiro[1][1], tabuleiro[2][2]],
+        [tabuleiro[0][2], tabuleiro[1][1], tabuleiro[2][0]]
+      ];
+
+      for (var i = 0; i < linhas.length; i++) {
+        if (linhas[i][0] !== null && linhas[i][0] === linhas[i][1] && linhas[i][0] === linhas[i][2]) {
+          alert('O jogador ' + linhas[i][0] + ' ganhou!');
+          resetar();
+        }
+      }
+    }
+
+    function resetar() {
+      tabuleiro = [
+        [null, null, null],
+        [null, null, null],
+        [null, null, null]
+      ];
+      jogadorAtual = 'X';
+      desenharTabuleiro();
+    }
+
+    desenharTabuleiro();
+  </script>
+</body>
+</html>

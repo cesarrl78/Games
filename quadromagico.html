@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
+    <title>Loja Mágica - Desenho</title>
+    <style>
+        #canvas {
+            border: 1px solid #000;
+            cursor: pointer;
+            margin-top: 20px;
+        }
+
+        body {
+            background-color: #FFD1DC;
+        }
+
+        header,
+        footer {
+            background-color: #FF91AB;
+            padding: 10px;
+            text-align: center;
+            color: white;
+        }
+    </style>
+</head>
+
+<body>
+    <header>
+        <h1>Loja Mágica - Desenho</h1>
+    </header>
+    <div class="container">
+        <div class="row">
+            <div class="col-md-12">
+                <select id="actionPicker" class="form-control mb-2">
+                    <option value="draw">Desenhar</option>
+                    <option value="erase">Borracha</option>
+                </select>
+                <select id="colorPicker" class="form-control mb-2">
+                    <option value="black">Preto</option>
+                    <option value="red">Vermelho</option>
+                    <option value="blue">Azul</option>
+                    <option value="green">Verde</option>
+                    <option value="yellow">Amarelo</option>
+                </select>
+                <button id="clearCanvas" class="btn btn-danger mb-2">Limpar Tudo</button>
+                <canvas id="canvas" width="500" height="500"></canvas>
+            </div>
+        </div>
+    </div>
+    <footer>
+        &copy; 2023 CRL - Loja Mágica. Todos os direitos reservados.
+    </footer>
+
+    <script>
+        const canvas = document.getElementById("canvas");
+        const ctx = canvas.getContext("2d");
+        const colorPicker = document.getElementById("colorPicker");
+        const actionPicker = document.getElementById("actionPicker");
+
+        let isDrawing = false;
+
+        canvas.addEventListener("mousedown", start);
+        canvas.addEventListener("mousemove", draw);
+        canvas.addEventListener("mouseup", stop);
+        canvas.addEventListener("mouseout", stop);
+        document.getElementById("clearCanvas").addEventListener("click", clearCanvas);
+
+        function start(e) {
+            isDrawing = true;
+            draw(e);
+        }
+
+        function draw(e) {
+            if (!isDrawing) return;
+
+            ctx.lineWidth = 5;
+            ctx.lineCap = "round";
+
+            if (actionPicker.value === "erase") {
+                ctx.globalCompositeOperation = "destination-out";
+                ctx.strokeStyle = "rgba(0,0,0,1)";
+            } else {
+                ctx.globalCompositeOperation = "source-over";
+                ctx.strokeStyle = colorPicker.value;
+            }
+
+            ctx.lineTo(e.clientX - canvas.getBoundingClientRect().left, e.clientY - canvas.getBoundingClientRect().top);
+            ctx.stroke();
+
+            ctx.beginPath();
+            ctx.moveTo(e.clientX - canvas.getBoundingClientRect().left, e.clientY - canvas.getBoundingClientRect().top);
+        }
+
+        function stop() {
+            isDrawing = false;
+            ctx.beginPath();
+        }
+
+        function clearCanvas() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+        }
+    </script>
+</body>
+
+</html>
